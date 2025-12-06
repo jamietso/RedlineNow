@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@types/diff-match-patch": "^1.0.36",
     "diff": "^8.0.2",
-    "html2pdf.js": "^0.12.1",
+    "diff-match-patch": "^1.0.5",
     "lucide-react": "^0.555.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"

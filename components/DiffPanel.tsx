@@ -64,7 +64,6 @@ export const DiffPanel: React.FC<PanelProps> = ({
             {isRawMode ? <Eye size={14} /> : <Code size={14} />}
             <span className="hidden xl:inline">{isRawMode ? "Visual" : "Raw"}</span>
           </button>
-          <span className="text-emerald-400 font-normal normal-case ml-2">Result</span>
         </div>
       </div>
       

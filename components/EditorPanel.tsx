@@ -26,7 +26,6 @@ export const EditorPanel: React.FC<PanelProps> = ({
               <span className="hidden xl:inline">Clear</span>
             </button>
           )}
-          <span className="text-slate-400 font-normal normal-case">Editable</span>
         </div>
       </div>
       <textarea

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import html2pdf from 'html2pdf.js';
 import { Header } from './components/Header';
 import { EditorPanel } from './components/EditorPanel';
 import { DiffPanel } from './components/DiffPanel';
 import { SummaryPanel } from './components/SummaryPanel';
-import { computeDiff, getDiffStats, generateHtmlDiff } from './services/diffService';
+import { computeDiff, getDiffStats, generateHtmlDiff, DiffMode } from './services/diffService';
 import { segmentDiffIntoSentences, generateRedlineSummary } from './services/aiService';
 import { DiffPart, ScrollSource, Sentence, SummaryResult } from './types';
 import { INITIAL_ORIGINAL, INITIAL_MODIFIED } from './constants';
@@ -12,6 +11,7 @@ import { INITIAL_ORIGINAL, INITIAL_MODIFIED } from './constants';
 export default function App() {
   const [original, setOriginal] = useState(INITIAL_ORIGINAL);
   const [modified, setModified] = useState(INITIAL_MODIFIED);
+  const [diffMode, setDiffMode] = useState<DiffMode>('char');
   const [diffData, setDiffData] = useState<DiffPart[]>([]);
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [isSyncScrolling, setIsSyncScrolling] = useState(true);
@@ -35,7 +35,7 @@ export default function App() {
   useEffect(() => {
     // Simple debounce for very long text could be added here if needed, 
     // but React 18 auto-batching handles this reasonably well for typical legal docs.
-    const parts = computeDiff(original, modified);
+    const parts = computeDiff(original, modified, diffMode);
     setDiffData(parts);
     
     const sents = segmentDiffIntoSentences(parts);
@@ -46,7 +46,7 @@ export default function App() {
       setSummary(null);
       setHighlightedSentenceId(null);
     }
-  }, [original, modified]);
+  }, [original, modified, diffMode]);
 
   // Sync scroll logic
   const handleScroll = useCallback((source: ScrollSource, el: HTMLElement) => {
@@ -105,43 +105,48 @@ export default function App() {
   };
 
   const handleCopy = async () => {
-    // Try to copy rich HTML to clipboard first, fallback to text
     try {
-      // We essentially want to copy what's in the diff panel
-      const diffElement = document.getElementById('diff-output-content');
+      const htmlContent = generateHtmlDiff(diffData);
+      // For plain text, we just want the raw text content
+      const textContent = diffData.map(p => p.value).join('');
       
-      if (diffElement) {
-        // Create a temporary range to select the content
-        const range = document.createRange();
-        range.selectNode(diffElement);
-        const selection = window.getSelection();
-        if (selection) {
-            selection.removeAllRanges();
-            selection.addRange(range);
-            document.execCommand('copy');
-            selection.removeAllRanges();
-            alert('Changes copied to clipboard!');
-        }
-      }
+      const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+      const blobText = new Blob([textContent], { type: 'text/plain' });
+      
+      // Use the Clipboard API to write both HTML and plain text
+      // This ensures formatting (colors, strikethrough) AND line breaks are preserved
+      const data = [new ClipboardItem({
+        'text/html': blobHtml,
+        'text/plain': blobText,
+      })];
+      
+      await navigator.clipboard.write(data);
+      alert('Changes copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy', err);
-      alert('Failed to copy changes.');
+      // Fallback for older browsers or if permission denied
+      try {
+        const diffElement = document.getElementById('diff-output-content');
+        if (diffElement) {
+          const range = document.createRange();
+          range.selectNode(diffElement);
+          const selection = window.getSelection();
+          if (selection) {
+              selection.removeAllRanges();
+              selection.addRange(range);
+              document.execCommand('copy');
+              selection.removeAllRanges();
+              alert('Changes copied to clipboard (Fallback method)!');
+          }
+        }
+      } catch (fallbackErr) {
+        alert('Failed to copy changes.');
+      }
     }
   };
 
   const handleExportPDF = () => {
-    const element = document.getElementById('diff-output-content');
-    if (!element) return;
-
-    const opt = {
-      margin: 0.5,
-      filename: 'legal_redline_diff.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(element).save();
+    window.print();
   };
 
   const handleResetAll = () => {
@@ -161,6 +166,8 @@ export default function App() {
         onReset={handleResetAll}
         onToggleSync={() => setIsSyncScrolling(!isSyncScrolling)}
         onGenerateSummary={handleGenerateSummary}
+        diffMode={diffMode}
+        onDiffModeChange={setDiffMode}
         syncEnabled={isSyncScrolling}
         stats={stats}
       />

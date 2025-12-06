@@ -1,19 +1,34 @@
+import { diff_match_patch } from 'diff-match-patch';
 import * as Diff from 'diff';
 import { DiffPart } from '../types';
 
+export type DiffMode = 'char' | 'word';
+
 /**
- * Compares two strings using a word-based diff algorithm ideal for legal text.
+ * Compares two strings using either Google's diff-match-patch (char) or jsdiff (word).
  * @param original The original text.
  * @param modified The modified text.
+ * @param mode The diff mode ('char' or 'word').
  * @returns An array of diff parts.
  */
-export const computeDiff = (original: string, modified: string): DiffPart[] => {
+export const computeDiff = (original: string, modified: string, mode: DiffMode = 'char'): DiffPart[] => {
   if (!original && !modified) return [];
   
-  // Use diffWords for legal-style "Redline" (whole words, ignoring whitespace changes slightly)
-  // or diffWordsWithSpace if exact spacing matters. 
-  // Legal usually prefers diffWords to avoid cluttering with whitespace diffs.
-  return Diff.diffWords(original, modified);
+  if (mode === 'word') {
+    return Diff.diffWords(original, modified);
+  }
+
+  const dmp = new diff_match_patch();
+  const diffs = dmp.diff_main(original, modified);
+  dmp.diff_cleanupSemantic(diffs);
+
+  return diffs.map(([op, text]) => {
+    return {
+      value: text,
+      added: op === 1,
+      removed: op === -1
+    };
+  });
 };
 
 /**
@@ -35,13 +50,25 @@ export const getDiffStats = (parts: DiffPart[]) => {
  * Converts diff parts to a raw HTML string for clipboard copying.
  */
 export const generateHtmlDiff = (parts: DiffPart[]): string => {
-  return parts.map(part => {
+  const htmlContent = parts.map(part => {
+    // Escape HTML special characters to prevent injection/rendering issues
+    const safeValue = part.value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+      .replace(/\n/g, '<br/>'); // Explicitly convert newlines to <br> tags
+
     if (part.added) {
-      return `<span style="color: blue; text-decoration: underline; text-decoration-skip-ink: none;">${part.value}</span>`;
+      return `<span style="color: blue; text-decoration: underline; text-decoration-skip-ink: none;">${safeValue}</span>`;
     }
     if (part.removed) {
-      return `<span style="color: red; text-decoration: line-through; text-decoration-skip-ink: none;">${part.value}</span>`;
+      return `<span style="color: red; text-decoration: line-through; text-decoration-skip-ink: none;">${safeValue}</span>`;
     }
-    return `<span>${part.value}</span>`;
+    return `<span>${safeValue}</span>`;
   }).join('');
+
+  // Wrap in a container with default font styles to ensure it looks right in email
+  return `<div style="font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; color: #000000;">${htmlContent}</div>`;
 };

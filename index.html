@@ -47,6 +47,58 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #94a3b8; 
       }
+      @media print {
+        /* Hide everything by default */
+        body {
+          visibility: hidden;
+          height: auto;
+          overflow: visible;
+        }
+
+        /* Reset layout constraints on all ancestors to allow full-page printing */
+        #root, main, div, section {
+          position: static !important;
+          overflow: visible !important;
+          display: block !important;
+          height: auto !important;
+          width: auto !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          transform: none !important;
+        }
+
+        /* Style the specific content we want to print */
+        #diff-output-content {
+          visibility: visible;
+          position: absolute !important;
+          left: 0 !important;
+          top: 0 !important;
+          width: 100% !important;
+          height: auto !important;
+          margin: 0 !important;
+          padding: 2cm !important; /* Standard print margin */
+          background: white !important;
+          color: black !important;
+          font-size: 11pt !important;
+          line-height: 1.5 !important;
+          z-index: 9999;
+          box-shadow: none !important;
+          border: none !important;
+        }
+
+        /* Ensure children are visible and colors are preserved */
+        #diff-output-content * {
+          visibility: visible;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          box-shadow: none !important;
+        }
+        
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+          display: none;
+        }
+      }
     </style>
   <script type="importmap">
 {
@@ -55,7 +107,6 @@
     "react": "https://aistudiocdn.com/react@^19.2.1",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
-    "html2pdf.js": "https://aistudiocdn.com/html2pdf.js@^0.12.1",
     "diff": "https://aistudiocdn.com/diff@^8.0.2"
   }
 }

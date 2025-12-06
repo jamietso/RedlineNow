@@ -1,5 +1,6 @@
 import React from 'react';
-import { FileDiff, Download, Copy, Trash2, Link2, Unlink2, Sparkles } from 'lucide-react';
+import { FileDiff, Download, Copy, Trash2, Link2, Unlink2, Sparkles, Settings2 } from 'lucide-react';
+import { DiffMode } from '../services/diffService';
 
 interface HeaderProps {
   onCopy: () => void;
@@ -7,6 +8,8 @@ interface HeaderProps {
   onReset: () => void;
   onToggleSync: () => void;
   onGenerateSummary: () => void;
+  diffMode: DiffMode;
+  onDiffModeChange: (mode: DiffMode) => void;
   syncEnabled: boolean;
   stats: { insertions: number; deletions: number };
 }
@@ -17,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   onReset, 
   onToggleSync,
   onGenerateSummary,
+  diffMode,
+  onDiffModeChange,
   syncEnabled,
   stats 
 }) => {
@@ -43,6 +48,17 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="h-8 w-px bg-slate-200 mx-2 hidden lg:block"></div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => onDiffModeChange(diffMode === 'char' ? 'word' : 'char')}
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-md hover:bg-slate-50 transition-colors"
+            title={`Current Mode: ${diffMode === 'char' ? 'Character (Precise)' : 'Word (Readable)'}`}
+          >
+            <Settings2 size={16} />
+            <span className="hidden md:inline">
+              {diffMode === 'char' ? 'Char Level' : 'Word Level'}
+            </span>
+          </button>
+
           <button
             onClick={onGenerateSummary}
             className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-medium rounded-md hover:from-indigo-700 hover:to-violet-700 shadow-sm transition-all active:scale-95"

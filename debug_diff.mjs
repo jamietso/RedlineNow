@@ -1,5 +1,5 @@
 
-import * as Diff from 'diff';
+import { diff_match_patch } from 'diff-match-patch';
 
 const original = `5.2 Client IP. Client owns all right, title, and interest in and to the Deliverables upon full payment of all fees due under the applicable SOW.
 
@@ -9,7 +9,15 @@ const modified = `5.2 Client IP. Client owns all right, title, and interest in a
 
 6. CONFIDENTIALITY`;
 
-const parts = Diff.diffWords(original, modified);
+const dmp = new diff_match_patch();
+const diffs = dmp.diff_main(original, modified);
+dmp.diff_cleanupSemantic(diffs);
+
+const parts = diffs.map(([op, text]) => ({
+  value: text,
+  added: op === 1,
+  removed: op === -1
+}));
 
 console.log("Diff Parts:");
 parts.forEach((part, i) => {
