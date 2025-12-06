@@ -1,0 +1,5 @@
+{
+  "name": "LegalRedline",
+  "description": "A professional legal-style text comparison tool featuring synchronized scrolling, word-level redlining, and PDF export.",
+  "requestFramePermissions": []
+}
