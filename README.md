@@ -7,14 +7,14 @@ LegalRedline is a modern React application designed for comparing legal document
 - **Side-by-Side Comparison**: View "Original" and "Modified" text in parallel editors.
 - **Redline Visualization**: Clear visual highlighting of insertions (green) and deletions (red) in a dedicated Diff panel.
 - **Synchronized Scrolling**: Keep all views in sync as you navigate through long documents.
-- **AI-Powered Summaries**: Uses Google's Gemini 2.0 Flash model to analyze and summarize changes, helping you quickly understand the impact of edits.
+- **AI-Powered Summaries**: Uses Google's Gemini 2.5 Flash model to analyze and summarize changes, helping you quickly understand the impact of edits.
 - **Sentence-Level Analysis**: Intelligently segments text into sentences to provide granular context for changes.
 - **Real-time Diffing**: Updates the redline view instantly as you type or paste text.
 
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite
-- **AI**: Google Generative AI SDK (Gemini 2.0 Flash)
+- **AI**: Google Generative AI SDK (Gemini 2.5 Flash)
 - **Diffing**: `diff-match-patch`, `diff`
 - **UI/Icons**: Lucide React
 
@@ -52,7 +52,7 @@ Start the development server:
 npm run dev
 ```
 
-Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal).
+Open the URL shown in your terminal to view the app.
 
 ## Usage
 
