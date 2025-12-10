@@ -1,13 +1,15 @@
 import React from 'react';
-import { FileDiff, Download, Copy, Trash2, Link2, Unlink2, Sparkles, Settings2 } from 'lucide-react';
+import { FileDiff, Download, Copy, Trash2, Link2, Unlink2, Sparkles, Settings2, BookOpen } from 'lucide-react';
 import { DiffMode } from '../services/diffService';
 
 interface HeaderProps {
   onCopy: () => void;
   onExportPdf: () => void;
+  onExportWord?: () => void;
   onReset: () => void;
   onToggleSync: () => void;
   onGenerateSummary: () => void;
+  onOpenPlaybook: () => void;
   diffMode: DiffMode;
   onDiffModeChange: (mode: DiffMode) => void;
   syncEnabled: boolean;
@@ -16,10 +18,12 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ 
   onCopy, 
-  onExportPdf, 
+  onExportPdf,
+  onExportWord,
   onReset, 
   onToggleSync,
   onGenerateSummary,
+  onOpenPlaybook,
   diffMode,
   onDiffModeChange,
   syncEnabled,
@@ -38,6 +42,18 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-4 lg:gap-6">
+        {/* Playbooks Button */}
+        <button
+          onClick={onOpenPlaybook}
+          className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-full text-xs font-medium border border-slate-200 text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors"
+          title="Open Playbook Manager"
+        >
+          <BookOpen size={14} />
+          <span>Playbooks</span>
+        </button>
+
+        <div className="h-8 w-px bg-slate-200 hidden lg:block"></div>
+
         {/* Stats Pill */}
         <div className="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-1.5 text-xs font-medium border border-slate-200">
            <span className="text-red-600 mr-3">{stats.deletions} Deletions</span>
@@ -99,6 +115,16 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">Copy</span>
           </button>
 
+          {onExportWord && (
+            <button 
+              onClick={onExportWord}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 shadow-sm shadow-green-200 transition-all active:scale-95"
+              title="Export to Word"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Word</span>
+            </button>
+          )}
           <button 
             onClick={onExportPdf}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 shadow-sm shadow-indigo-200 transition-all active:scale-95"
