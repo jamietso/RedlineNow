@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { DiffPart, Sentence, SummaryResult } from '../types';
+import { DiffPart, Sentence, SummaryResult, PlaybookEntry } from '../types';
 
 // Initialize Gemini API
 // Note: In a real production app, you might want to proxy this through a backend to hide the key,
@@ -82,8 +82,13 @@ const createSentence = (id: number, parts: DiffPart[]): Sentence => {
 
 /**
  * Generates a summary for the edited sentences using Gemini.
+ * @param sentences - Array of sentences from the diff
+ * @param approvedPlaybookRules - Optional array of approved playbook rules to guide the analysis
  */
-export const generateRedlineSummary = async (sentences: Sentence[]): Promise<SummaryResult> => {
+export const generateRedlineSummary = async (
+  sentences: Sentence[],
+  approvedPlaybookRules?: PlaybookEntry[]
+): Promise<SummaryResult> => {
   if (!API_KEY) {
     throw new Error("Gemini API Key is missing. Please set VITE_GEMINI_API_KEY in .env.local");
   }
@@ -94,17 +99,32 @@ export const generateRedlineSummary = async (sentences: Sentence[]): Promise<Sum
     return { items: [], highLevelSummary: "No changes detected." };
   }
 
+  // Build playbook context if rules are provided
+  let playbookContext = '';
+  if (approvedPlaybookRules && approvedPlaybookRules.length > 0) {
+    playbookContext = `
+
+IMPORTANT: Apply the following playbook rules when analyzing changes:
+${approvedPlaybookRules.map((rule, index) => `${index + 1}. ${rule.text}`).join('\n')}
+
+When analyzing the changes, consider whether they align with or violate these playbook guidelines.
+Highlight any violations or concerns based on these rules.`;
+  }
+
   // We'll batch the request to avoid too many API calls.
   // We'll send all edited sentences with their IDs and ask for a JSON response.
   
   const prompt = `
     You are a legal expert assistant. Analyze the following list of sentences from a legal document redline.
     Each sentence has an ID and text where additions are marked with [ADDED: ...] and deletions with [REMOVED: ...].
+    ${playbookContext}
 
     For each sentence:
     1. Generate a concise, plain-English description of what changed (e.g., "Changed payment terms from 30 to 45 days").
+    ${approvedPlaybookRules && approvedPlaybookRules.length > 0 ? '2. Note any playbook rule violations or concerns.' : ''}
     
     Then, generate a single "highLevelSummary" paragraph that summarizes the overall impact of these changes.
+    ${approvedPlaybookRules && approvedPlaybookRules.length > 0 ? 'Include any playbook compliance concerns in the summary.' : ''}
 
     Return the result as a JSON object with this structure:
     {
