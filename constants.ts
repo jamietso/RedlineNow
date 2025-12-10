@@ -1,4 +1,7 @@
-export const INITIAL_ORIGINAL = `MASTER SERVICES AGREEMENT
+// Pre-loaded sample text (saved for later use):
+// Uncomment and rename to INITIAL_ORIGINAL if you want to use this sample text
+/*
+export const INITIAL_ORIGINAL_SAMPLE = `MASTER SERVICES AGREEMENT
 
 This Master Services Agreement ("Agreement") is entered into as of January 1, 2023 ("Effective Date") by and between TechSolutions Inc., a Delaware corporation ("Provider"), and Global Corp LLC, a California limited liability company ("Client").
 
@@ -59,8 +62,12 @@ Neither party shall be liable for any failure or delay in performance under this
 15.3 Amendments. No modification or amendment to this Agreement shall be effective unless in writing and signed by authorized representatives of both parties.
 15.4 Severability. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.
 15.5 Waiver. No waiver of any term or condition of this Agreement shall be valid or binding on either party unless the same shall have been set forth in a written document, specifically referring to this Agreement and duly signed by the waiving party.`;
+*/
 
-export const INITIAL_MODIFIED = `AMENDED AND RESTATED MASTER SERVICES AGREEMENT
+// Pre-loaded modified sample text (saved for later use):
+// Uncomment and rename to INITIAL_MODIFIED if you want to use this sample text
+/*
+export const INITIAL_MODIFIED_SAMPLE = `AMENDED AND RESTATED MASTER SERVICES AGREEMENT
 
 This Amended and Restated Master Services Agreement ("Agreement") is entered into as of February 15, 2024 ("Effective Date") by and between TechSolutions Inc., a Delaware corporation ("Provider"), and Global Corp LLC, a Delaware limited liability company ("Client").
 
@@ -124,3 +131,8 @@ Neither party shall be liable for any failure or delay in performance under this
 15.4 Severability. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.
 15.5 Waiver. No waiver of any term or condition of this Agreement shall be valid or binding on either party unless the same shall have been set forth in a written document, specifically referring to this Agreement and duly signed by the waiving party.
 15.6 Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.`;
+*/
+
+// Current initial values - empty strings for clean user experience
+export const INITIAL_ORIGINAL = '';
+export const INITIAL_MODIFIED = '';
